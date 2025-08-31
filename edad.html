@@ -1,32 +1,202 @@
-<form action="" method="post">
-    <html lang="es">
-        <head>MANDAME TUS DATOS DE CONTACTO</head>
-        
-    <div>
-        <label for "correo">Tu correo</label>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Formulario corregido</title>
+  <style>
+    input:invalid { outline: 2px solid crimson; }
+    input:valid   { outline: 2px solid #4caf50; }
+    .error { color: crimson; font-size: 0.9rem; }
+    label { display:block; margin-bottom:4px; }
+    .field { margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+  <form id="formContacto" action="" method="post" novalidate>
+    <h2>MÁNDAME TUS DATOS DE CONTACTO</h2>
+   
+    <fieldset>
+<legend>Datos personales</legend>
+    <div class="field">
+      <label for="nombres">Tus Nombres</label>
+      <input
+        type="text"
+        id="nombres"
+        name="nombres"
+        autocomplete="given-name"
+        inputmode="text"
+        minlength="3"
+        maxlength="30"
+        pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$"
+        title="Solo letras (incluye tildes y ñ) y espacios. 3-30 caracteres."
+        required
+      />
+      <div id="error-nombres" class="error" aria-live="polite"></div>
+    </div>
 
-        <input type "texto" id="texto"
-        name"nuevo" 
-        minlength="6"
-        maxlength="15"
+    <div class="field">
+      <label for="apellidos">Tus Apellidos</label>
+      <input
+        type="text"
+        id="apellidos"
+        name="apellidos"
+        autocomplete="family-name"
+        inputmode="text"
+        minlength="3"
+        maxlength="30"
+        pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$"
+        title="Solo letras (incluye tildes y ñ) y espacios. 3-30 caracteres."
+        required
+      />
+      <div id="error-apellidos" class="error" aria-live="polite"></div>
+    </div>
+</fieldset>
 
-         pattern="A-Z"
-          title="solo se perimten letras y espacios"required><br><br>
-        
+    <fieldset>
+      <legend>Datos de contacto</legend>
+    <div class="field">
+      <label for="telefono">Tu número telefónico</label>
+      <input
+        type="tel"
+        id="telefono"
+        name="telefono"
+        inputmode="tel"
+        maxlength="10"
+        pattern="^\d{7,10}$"
+        title="Solo números. Entre 7 y 10 dígitos."
+        required
+      />
+      <div id="error-telefono" class="error" aria-live="polite"></div>
+    </div>
 
-        <div>
-            <label for="numero">Edad</label>
+    <div class="field">
+      <label for="direccion">Tu dirección</label>
+      <input
+        type="text"
+        id="direccion"
+        name="direccion"
+        minlength="3"
+        maxlength="40"
+        title="Dirección (3-40 caracteres)"
+        required
+      />
+      <div id="error-direccion" class="error" aria-live="polite"></div>
+    </div>
+
+    <div class="field">
+      <label for="edad">Edad</label>
+      <input
+        type="number"
+        id="edad"
+        name="edad"
+        min="1"
+        max="99"
+        title="Edad entre 1 y 99"
+        required
+      />
+      <div id="error-edad" class="error" aria-live="polite"></div>
+    </div>
     
-    
-            <input type="number" id ="edad"
-            name"edad"
-             min="1"
-            max="18"
-             required><br><br>
-        </div>
-        <div>
-            <button>Enviar</button>
-        </div>
 
-    </form>
-    </html>
+    <button type="submit">Enviar</button>
+  </form>
+</fieldset>
+  <script>
+    // Helpers: elementos
+    const form = document.getElementById('formContacto');
+    const nombres = document.getElementById('nombres');
+    const apellidos = document.getElementById('apellidos');
+    const telefono = document.getElementById('telefono');
+    const direccion = document.getElementById('direccion');
+    const edad = document.getElementById('edad');
+
+    const errNombres = document.getElementById('error-nombres');
+    const errApellidos = document.getElementById('error-apellidos');
+    const errTelefono = document.getElementById('error-telefono');
+    const errDireccion = document.getElementById('error-direccion');
+    const errEdad = document.getElementById('error-edad');
+
+    // Regex para letras (incluye acentos y ñ) y espacios
+    const letrasRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
+    const telefonoRegex = /^\d{7,10}$/;
+
+    // En tiempo real: limpiar caracteres no permitidos mientras escribe
+    function permitirSoloLetras(e) {
+      // elimina todo lo que no sea letra (con tildes, ñ) ni espacio
+      this.value = this.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');
+    }
+
+    function permitirSoloNumeros(e) {
+      // elimina todo lo que no sea dígito
+      this.value = this.value.replace(/[^\d]/g, '');
+    }
+
+    nombres.addEventListener('input', permitirSoloLetras);
+    apellidos.addEventListener('input', permitirSoloLetras);
+    telefono.addEventListener('input', permitirSoloNumeros);
+
+    // Validación al intentar enviar
+    form.addEventListener('submit', function (e) {
+      let valido = true;
+
+      // Nombres
+      if (!letrasRegex.test(nombres.value) || nombres.value.length < 3 || nombres.value.length > 30) {
+        errNombres.textContent = 'Ingresa tus nombres (solo letras, 3-30 caracteres).';
+        nombres.setCustomValidity('Inválido');
+        valido = false;
+      } else {
+        errNombres.textContent = '';
+        nombres.setCustomValidity('');
+      }
+
+      // Apellidos
+      if (!letrasRegex.test(apellidos.value) || apellidos.value.length < 3 || apellidos.value.length > 30) {
+        errApellidos.textContent = 'Ingresa tus apellidos (solo letras, 3-30 caracteres).';
+        apellidos.setCustomValidity('Inválido');
+        valido = false;
+      } else {
+        errApellidos.textContent = '';
+        apellidos.setCustomValidity('');
+      }
+
+      // Teléfono
+      if (!telefonoRegex.test(telefono.value)) {
+        errTelefono.textContent = 'Teléfono inválido. Solo números, 7 a 10 dígitos.';
+        telefono.setCustomValidity('Inválido');
+        valido = false;
+      } else {
+        errTelefono.textContent = '';
+        telefono.setCustomValidity('');
+      }
+
+      // Dirección
+      if (direccion.value.length < 3 || direccion.value.length > 40) {
+        errDireccion.textContent = 'Dirección demasiado corta o larga (3-40 caracteres).';
+        direccion.setCustomValidity('Inválido');
+        valido = false;
+      } else {
+        errDireccion.textContent = '';
+        direccion.setCustomValidity('');
+      }
+
+      // Edad
+      const edadNum = Number(edad.value);
+      if (!Number.isInteger(edadNum) || edadNum < 1 || edadNum > 2) {
+        errEdad.textContent = 'Edad inválida. Introduce un número entre 1 y 2.';
+        edad.setCustomValidity('Inválido');
+        valido = false;
+      } else {
+        errEdad.textContent = '';
+        edad.setCustomValidity('');
+      }
+
+      if (!valido) {
+        e.preventDefault();
+        // Muestra la validación nativa además del mensaje personalizado
+        form.reportValidity();
+      }
+    });
+  </script>
+</body>
+</html>
